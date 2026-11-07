@@ -1,0 +1,167 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 60 9% 95%;
+    --foreground: 0 0% 4%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 4%;
+    --primary: 151 96% 43%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 240 5% 90%;
+    --secondary-foreground: 0 0% 4%;
+    --muted: 0 0% 64%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 255 86% 60%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
+    --ring: 151 96% 43%;
+    --radius: 0.25rem;
+    --acid-yellow: 56 94% 56%;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+    font-feature-settings: 'ss01', 'cv11';
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+}
+
+@layer utilities {
+  .logo-track-up,
+  .logo-track-down {
+    will-change: transform;
+  }
+  .logo-track-up {
+    animation: logo-scroll-up 22s linear infinite;
+  }
+  .logo-track-down {
+    animation: logo-scroll-down 25s linear infinite;
+  }
+
+  /* Sweeping highlight on primary CTAs */
+  .cta-shine::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -40%;
+    width: 30%;
+    transform: skewX(-20deg);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+    animation: cta-shine 3.2s ease-in-out infinite;
+    pointer-events: none;
+  }
+}
+
+@keyframes logo-scroll-up {
+  0% {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+@keyframes logo-scroll-down {
+  0% {
+    transform: translateY(-50%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes cta-shine {
+  0%,
+  55% {
+    left: -40%;
+  }
+  to {
+    left: 120%;
+  }
+}
+@keyframes testimonial-progress {
+  0% {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes mark-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes mark-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+}
+@keyframes mark-bar {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+@keyframes mark-draw {
+  0% {
+    stroke-dashoffset: 300;
+  }
+  45%,
+  70% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: -300;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-track-up,
+  .logo-track-down,
+  .cta-shine::after {
+    animation: none !important;
+  }
+}
