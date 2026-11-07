@@ -83,7 +83,7 @@ export function Header() {
     >
       <div
         className={cn(
-          'relative mx-auto flex h-14 max-w-[1180px] items-center justify-between rounded-full border border-black/5 bg-white pl-4 pr-1.5 ring-[5px] ring-white/25 backdrop-blur-md transition-shadow duration-300 md:h-[60px] md:pl-6 md:pr-2',
+          'relative mx-auto flex h-14 max-w-[1180px] items-center justify-between rounded-full border border-black/5 bg-white pl-4 pr-1.5 ring-[5px] ring-white/25 transition-shadow duration-300 md:h-[60px] md:pl-6 md:pr-2',
           isScrolled ? 'shadow-[0_10px_30px_rgba(0,0,0,0.14)]' : 'shadow-[0_6px_18px_rgba(0,0,0,0.08)]',
         )}
       >

@@ -22,7 +22,7 @@ const toVars: gsap.TweenVars = { autoAlpha: 1, y: 0, scale: 1, ease: 'none' }
  * - `data-reveal-each`      each direct child gets its own trigger
  *
  * Give any of them the value `"scale"` for a rise-and-grow variant.
- * Mount with `key={pathname}` so it rebinds after every route change.
+ * Mount it once the page's content is in the DOM; it binds on mount and cleans up on unmount.
  */
 export function RevealManager() {
   useEffect(() => {

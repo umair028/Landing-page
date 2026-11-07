@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useCallback, useEffect, useState } from 'react'
+import { afterLoad } from '@/lib/idle'
 
 type BusinessType = 'new' | 'existing' | 'dismissed'
 
@@ -37,8 +38,14 @@ export function BusinessTypeModal() {
 
   useEffect(() => {
     if (readStoredType()) return
-    const timer = window.setTimeout(() => setIsOpen(true), OPEN_DELAY_MS)
-    return () => window.clearTimeout(timer)
+    let timer = 0
+    const cancelLoad = afterLoad(() => {
+      timer = window.setTimeout(() => setIsOpen(true), OPEN_DELAY_MS)
+    })
+    return () => {
+      cancelLoad()
+      window.clearTimeout(timer)
+    }
   }, [])
 
   useEffect(() => {

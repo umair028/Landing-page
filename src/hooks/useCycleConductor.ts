@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { prefersReducedMotion } from '@/lib/gsap'
+import { afterLoad } from '@/lib/idle'
 
 /*
  * Coordinates a group of `CrossfadeCycle` instances so they take turns changing
@@ -54,14 +55,15 @@ function pickBatchSize(weights: Array<[size: number, weight: number]>): number {
 /**
  * Every `everyMs`, picks a random group of cards (size drawn from `weights`) and changes
  * them together. Cards from the previous group are picked last, so the same cards
- * don't keep repeating and every card keeps getting turns.
+ * don't keep repeating and every card keeps getting turns. The start delay is counted
+ * from the window `load` event so the first swaps never compete with start-up work.
  */
 export function useCycleConductor(
   names: string[],
   { everyMs = 2200, weights = BATCH_WEIGHTS, startDelayMs = 1800 } = {},
 ) {
   useEffect(() => {
-    if (prefersReducedMotion()) return
+    if (prefersReducedMotion() || names.length === 0) return
     let lastBatch: string[] = []
     const tick = () => {
       if (document.hidden) return
@@ -73,11 +75,15 @@ export function useCycleConductor(
       batch.forEach((name) => channels.get(name)?.forEach((fn) => fn()))
     }
     let interval = 0
-    const start = window.setTimeout(() => {
-      tick()
-      interval = window.setInterval(tick, everyMs)
-    }, startDelayMs)
+    let start = 0
+    const cancelLoad = afterLoad(() => {
+      start = window.setTimeout(() => {
+        tick()
+        interval = window.setInterval(tick, everyMs)
+      }, startDelayMs)
+    })
     return () => {
+      cancelLoad()
       window.clearTimeout(start)
       window.clearInterval(interval)
     }

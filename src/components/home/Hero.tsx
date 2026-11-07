@@ -5,8 +5,10 @@ import { site } from '@/config/site'
 import { heroPhrases, marqueeWords } from '@/data/content'
 import { people } from '@/data/art'
 import { useCycleConductor } from '@/hooks/useCycleConductor'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useTypewriter } from '@/hooks/useTypewriter'
 import { gsap, prefersReducedMotion } from '@/lib/gsap'
+import { whenIdleAfterLoad } from '@/lib/idle'
 import { smoothScrollTo } from '@/lib/scroll'
 import { Avatar } from '@/components/art/Avatar'
 import { CrossfadeCycle } from '@/components/shared/CrossfadeCycle'
@@ -31,6 +33,9 @@ const COLLAPSE_AT = 0.35
 const RESTORE_AT = 0.2
 const titleCls =
   'block font-display text-[clamp(2.75rem,6.5vw,4.75rem)] font-[900] normal-case leading-[0.92] tracking-[-0.05em] lg:text-[4.9vw]'
+/** The floating sample cards only exist from the `lg` breakpoint up. */
+const DESKTOP_QUERY = '(min-width: 1024px)'
+const NO_CHANNELS: string[] = []
 const barCls =
   'flex items-center gap-[0.3em] font-display text-[clamp(2rem,4.8vw,3.5rem)] font-[900] normal-case leading-none tracking-[-0.04em] lg:text-[3.6vw]'
 
@@ -185,15 +190,21 @@ function HeroForm() {
 
 export function Hero() {
   const rootRef = useRef<HTMLElement>(null)
-  useCycleConductor(heroChannels)
+  // Smaller screens never show the floating cards, so they skip rendering, cycling and
+  // preloading them entirely.
+  const showCards = useMediaQuery(DESKTOP_QUERY)
+  useCycleConductor(showCards ? heroChannels : NO_CHANNELS)
 
-  // The floating cards only render from the lg breakpoint, so smaller screens skip the preload.
+  // Warm the cache for upcoming slides once the page is idle, so they don't compete
+  // with the first paint for bandwidth.
   useEffect(() => {
-    if (!window.matchMedia('(min-width: 1024px)').matches) return
-    heroImages.forEach((src) => {
-      new Image().src = src
+    if (!showCards) return
+    return whenIdleAfterLoad(() => {
+      heroImages.forEach((src) => {
+        new Image().src = src
+      })
     })
-  }, [])
+  }, [showCards])
 
   useLayoutEffect(() => {
     const section = rootRef.current
@@ -511,7 +522,7 @@ export function Hero() {
       cleanups.forEach((f) => f())
       ctx.revert()
     }
-  }, [])
+  }, [showCards])
 
   const marqueeRow = (hidden?: boolean) => (
     <div className="flex shrink-0 items-center" aria-hidden={hidden || undefined}>
@@ -529,60 +540,62 @@ export function Hero() {
   return (
     <section
       ref={rootRef}
-      className="relative flex w-full flex-col lg:min-h-[100dvh] items-center justify-center overflow-hidden bg-primary"
+      className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-primary lg:min-h-[100dvh]"
     >
       <HeroBackdrop video={site.heroVideo} />
       {!site.heroVideo && <HeroMotionField />}
 
       {/* floating work + people */}
-      <div className="pointer-events-none absolute inset-0 z-[5]">
-        <FloatCard pos="lg:left-[10%] lg:top-[21%] lg:h-[11vw] lg:w-[11vw]">
-          <CrossfadeCycle slides={logoSlides} channel="hero-logos" label="Custom logo design samples" />
-        </FloatCard>
-        <FloatCard pos="lg:left-[14%] lg:top-[46%] lg:h-[10vw] lg:w-[10vw]">
-          <CrossfadeCycle slides={logoWebSlides} channel="hero-logoWeb" label="Logo and website design samples" />
-        </FloatCard>
-        <FloatCard pos="lg:left-[19%] lg:top-[70%] lg:h-[10vw] lg:w-[10vw]">
-          <CrossfadeCycle slides={brandSlides} channel="hero-brand" label="Branding samples" />
-        </FloatCard>
-        <FloatCard pos="lg:left-[74%] lg:top-[68%] lg:h-[10vw] lg:w-[10vw]" bg="bg-black">
-          <CrossfadeCycle slides={motionSlides} channel="hero-motion" label="Animated logo samples" />
-        </FloatCard>
-        <FloatCard pos="lg:left-[78.5%] lg:top-[16%] lg:h-[10vw] lg:w-[10vw]" bg="bg-white">
-          <CrossfadeCycle slides={webMotionSlides} channel="hero-webMotion" label="Website and animation samples" />
-        </FloatCard>
-        <FloatCard pos="lg:left-[72%] lg:top-[40.5%] lg:h-[10vw] lg:w-[12.5vw]" bg="bg-[#3b6cf6]">
-          <CrossfadeCycle slides={webSlides} channel="hero-web" label="Website design samples" />
-        </FloatCard>
-        <FloatCard
-          round
-          pos="lg:left-[8.5%] lg:top-[56%] lg:h-[5.2vw] lg:w-[5.2vw]"
-          spark="-left-[40%] -bottom-[24%] rotate-180"
-        >
-          <Avatar spec={people[0]} className="h-full w-full" />
-        </FloatCard>
-        <FloatCard
-          round
-          pos="lg:left-[24.5%] lg:top-[40.5%] lg:h-[4.2vw] lg:w-[4.2vw]"
-          spark="-left-[40%] -top-[24%] -scale-x-100"
-        >
-          <Avatar spec={people[1]} className="h-full w-full" />
-        </FloatCard>
-        <FloatCard
-          round
-          pos="lg:left-[74%] lg:top-[27%] lg:h-[4vw] lg:w-[4vw]"
-          spark="-left-[40%] -top-[24%] -scale-x-100"
-        >
-          <Avatar spec={people[2]} className="h-full w-full" />
-        </FloatCard>
-        <FloatCard
-          round
-          pos="lg:left-[87.5%] lg:top-[50%] lg:h-[5.2vw] lg:w-[5.2vw]"
-          spark="-right-[40%] -bottom-[24%] -scale-y-100"
-        >
-          <Avatar spec={people[3]} className="h-full w-full" />
-        </FloatCard>
-      </div>
+      {showCards && (
+        <div className="pointer-events-none absolute inset-0 z-[5]">
+          <FloatCard pos="lg:left-[10%] lg:top-[21%] lg:h-[11vw] lg:w-[11vw]">
+            <CrossfadeCycle slides={logoSlides} channel="hero-logos" label="Custom logo design samples" />
+          </FloatCard>
+          <FloatCard pos="lg:left-[14%] lg:top-[46%] lg:h-[10vw] lg:w-[10vw]">
+            <CrossfadeCycle slides={logoWebSlides} channel="hero-logoWeb" label="Logo and website design samples" />
+          </FloatCard>
+          <FloatCard pos="lg:left-[19%] lg:top-[70%] lg:h-[10vw] lg:w-[10vw]">
+            <CrossfadeCycle slides={brandSlides} channel="hero-brand" label="Branding samples" />
+          </FloatCard>
+          <FloatCard pos="lg:left-[74%] lg:top-[68%] lg:h-[10vw] lg:w-[10vw]" bg="bg-black">
+            <CrossfadeCycle slides={motionSlides} channel="hero-motion" label="Animated logo samples" />
+          </FloatCard>
+          <FloatCard pos="lg:left-[78.5%] lg:top-[16%] lg:h-[10vw] lg:w-[10vw]" bg="bg-white">
+            <CrossfadeCycle slides={webMotionSlides} channel="hero-webMotion" label="Website and animation samples" />
+          </FloatCard>
+          <FloatCard pos="lg:left-[72%] lg:top-[40.5%] lg:h-[10vw] lg:w-[12.5vw]" bg="bg-[#3b6cf6]">
+            <CrossfadeCycle slides={webSlides} channel="hero-web" label="Website design samples" />
+          </FloatCard>
+          <FloatCard
+            round
+            pos="lg:left-[8.5%] lg:top-[56%] lg:h-[5.2vw] lg:w-[5.2vw]"
+            spark="-left-[40%] -bottom-[24%] rotate-180"
+          >
+            <Avatar spec={people[0]} className="h-full w-full" />
+          </FloatCard>
+          <FloatCard
+            round
+            pos="lg:left-[24.5%] lg:top-[40.5%] lg:h-[4.2vw] lg:w-[4.2vw]"
+            spark="-left-[40%] -top-[24%] -scale-x-100"
+          >
+            <Avatar spec={people[1]} className="h-full w-full" />
+          </FloatCard>
+          <FloatCard
+            round
+            pos="lg:left-[74%] lg:top-[27%] lg:h-[4vw] lg:w-[4vw]"
+            spark="-left-[40%] -top-[24%] -scale-x-100"
+          >
+            <Avatar spec={people[2]} className="h-full w-full" />
+          </FloatCard>
+          <FloatCard
+            round
+            pos="lg:left-[87.5%] lg:top-[50%] lg:h-[5.2vw] lg:w-[5.2vw]"
+            spark="-right-[40%] -bottom-[24%] -scale-y-100"
+          >
+            <Avatar spec={people[3]} className="h-full w-full" />
+          </FloatCard>
+        </div>
+      )}
 
       {/* copy */}
       <div className="pointer-events-none relative z-30 flex w-full max-w-2xl flex-col items-center px-4 pb-28 pt-32 text-center text-white sm:max-w-3xl md:max-w-4xl md:pb-36 md:pt-40 lg:pb-32 lg:pt-32">
@@ -594,7 +607,7 @@ export function Hero() {
           {site.tagline}
           <span className="hidden h-px w-8 bg-white/60 sm:block md:w-12" />
         </p>
-        <h1 className="flex w-full flex-col items-center text-white [text-shadow:0_4px_24px_rgba(0,0,0,0.12)]">
+        <h1 className="flex w-full flex-col items-center text-white">
           <span data-hero-fade-word="" className={titleCls}>
             Get a Custom
           </span>
@@ -609,11 +622,11 @@ export function Hero() {
             <span
               data-hero-bar=""
               aria-hidden="true"
-              className={`${barCls} absolute inset-0 rounded-[18px] bg-[#0b3a22] px-5 py-2.5 shadow-[0_18px_40px_-12px_rgba(0,0,0,0.45)] ring-1 ring-white/10 [text-shadow:none] md:rounded-full md:px-8 md:py-3.5`}
+              className={`${barCls} absolute inset-0 rounded-[18px] bg-[#0b3a22] px-5 py-2.5 shadow-[0_18px_40px_-12px_rgba(0,0,0,0.45)] ring-1 ring-white/10 md:rounded-full md:px-8 md:py-3.5`}
               style={{ clipPath: CLIP_HIDDEN }}
             >
               <Timer className="h-[1.05em] w-[1.05em] shrink-0 text-[#b6f36a]" strokeWidth={2.5} />
-              <span className="bg-gradient-to-b from-[#e4ff8a] to-[#3ddc84] bg-clip-text text-transparent [text-shadow:none]">
+              <span className="bg-gradient-to-b from-[#e4ff8a] to-[#3ddc84] bg-clip-text text-transparent">
                 24:00 Hours.
               </span>
             </span>

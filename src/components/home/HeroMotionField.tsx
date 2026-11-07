@@ -1,11 +1,13 @@
 import { useEffect, useRef } from 'react'
 import { prefersReducedMotion } from '@/lib/gsap'
+import { afterLoad } from '@/lib/idle'
 
 /**
  * Moving "pixel tile" field behind the hero: a lightweight canvas stand-in for a
  * looping background video (dimmed, monochrome, low opacity). Wavy bands of tiles
  * drift sideways and flicker; tiles show an ✕, a solid block or a dot pair.
  * Pauses off-screen / in background tabs and renders one still frame for reduced motion.
+ * The loop only starts after the page has loaded, so it never competes with start-up work.
  */
 export function HeroMotionField({ className = '' }: { className?: string }) {
   const ref = useRef<HTMLCanvasElement>(null)
@@ -127,9 +129,10 @@ export function HeroMotionField({ className = '' }: { className?: string }) {
     const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting))
     io.observe(canvas)
     resize()
-    if (!reduced) raf = requestAnimationFrame(loop)
+    const cancelLoad = reduced ? () => {} : afterLoad(() => (raf = requestAnimationFrame(loop)))
 
     return () => {
+      cancelLoad()
       cancelAnimationFrame(raf)
       ro.disconnect()
       io.disconnect()

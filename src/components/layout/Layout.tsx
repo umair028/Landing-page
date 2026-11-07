@@ -1,17 +1,22 @@
-import { Outlet, useLocation } from 'react-router-dom'
+import { Outlet } from 'react-router-dom'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { BusinessTypeModal } from './BusinessTypeModal'
 import { Cursor } from './Cursor'
 import { Footer } from './Footer'
 import { Header } from './Header'
-import { RevealManager } from './RevealManager'
 
-/** Shared page chrome: header, footer, custom cursor and site-wide overlays. */
+/**
+ * Shared page chrome: header, footer, custom cursor and site-wide overlays.
+ *
+ * Pages mount their own `RevealManager` once their content is in the DOM, since the
+ * home page renders its lower sections progressively after the first paint.
+ */
 export function Layout() {
-  const { pathname } = useLocation()
+  const hasFinePointer = useMediaQuery('(pointer: fine)')
 
   return (
     <div className="relative w-full bg-background selection:bg-primary selection:text-black">
-      <Cursor />
+      {hasFinePointer && <Cursor />}
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-full focus:bg-black focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-white"
@@ -23,8 +28,6 @@ export function Layout() {
         <Outlet />
       </main>
       <Footer />
-      {/* Keyed by route so scroll reveals are rebound against the new page's DOM. */}
-      <RevealManager key={pathname} />
       <BusinessTypeModal />
     </div>
   )
