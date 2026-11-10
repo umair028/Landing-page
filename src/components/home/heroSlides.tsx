@@ -44,8 +44,13 @@ export const logoSlides: ReactNode[] = deck(logosA, HERO_SHUFFLE_SEED)
 /** Left-middle card: the rest of the client logos mixed with website mockups. */
 export const logoWebSlides: ReactNode[] = deck([...logosB, ...shotsA], HERO_SHUFFLE_SEED + 1)
 
-/** Left-bottom card: brand identity boards, decks and mockups. */
-export const brandSlides: ReactNode[] = deck(brandWork, HERO_SHUFFLE_SEED + 2)
+/** Brand Identity pieces picked for the hero; the rest stay in the Portfolio section only. */
+const HERO_BRAND_PICKS = ["Pancho's", 'Maria Bella', 'Retrevo', 'Hair Reality', 'Compacta']
+
+const heroBrand = brandWork.filter((b) => HERO_BRAND_PICKS.includes(b.name))
+
+/** Left-bottom card: a hand-picked set of brand identity mockups. */
+export const brandSlides: ReactNode[] = deck(heroBrand, HERO_SHUFFLE_SEED + 2)
 
 /** Right-bottom card: logo animations. */
 export const motionSlides: ReactNode[] = deck(motionA, HERO_SHUFFLE_SEED + 3)
@@ -61,7 +66,7 @@ export const webSlides: ReactNode[] = shuffled(
 
 /** Still images preloaded up front so each slide is ready when its crossfade starts. Videos stream on demand. */
 export const heroImages = [
-  ...[...clientLogos, ...brandWork, ...motionWork, ...websiteShots].map((p) => p.src),
+  ...[...clientLogos, ...heroBrand, ...motionWork, ...websiteShots].map((p) => p.src),
   ...Object.values(siteShots),
 ]
 
