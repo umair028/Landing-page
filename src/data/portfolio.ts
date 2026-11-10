@@ -18,6 +18,9 @@ export type PortfolioItem = {
 /** Fixed seed so the shuffled Website Design order is the same on every visit. */
 const WEB_SHUFFLE_SEED = 7
 
+/** Fixed seed so the shuffled Brand Identity order is the same on every visit. */
+const BRAND_SHUFFLE_SEED = 5
+
 /** Fixed seed so the shuffled Animated Logos order is the same on every visit. */
 const MOTION_SHUFFLE_SEED = 3
 
@@ -32,7 +35,15 @@ export const portfolio: PortfolioItem[] = [
     })),
     MOTION_SHUFFLE_SEED,
   ),
-  ...brandWork.map((b, i) => ({ id: `brand-${i}`, title: `${b.name} Identity`, category: 'brand' as const, ref: i })),
+  ...shuffled(
+    brandWork.map((b, i): PortfolioItem => ({
+      id: `brand-${i}`,
+      title: `${b.name} Identity`,
+      category: 'brand',
+      ref: i,
+    })),
+    BRAND_SHUFFLE_SEED,
+  ),
   ...shuffled(
     [
       ...sites.map((s, i): PortfolioItem => ({

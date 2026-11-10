@@ -168,16 +168,10 @@ const retrevoReveal: WorkImage = {
   alt: 'Retrevo finance brand reveal with an R monogram on a glass wall sign',
 }
 
-/** Grid slot for the Retrevo video: second row, last column of the five-column grid. */
-const RETREVO_SLOT = 9
-
-const brandImages = toImages(brandRows, BRAND_DIR)
-
-/** Brand identity boards, guideline decks and stationery mockups for the Brand Identity tab. */
+/** Brand identity boards, guideline decks and stationery mockups. The Brand Identity tab shows them shuffled. */
 export const brandWork: WorkImage[] = [
-  ...brandImages.slice(0, RETREVO_SLOT),
+  ...toImages(brandRows, BRAND_DIR),
   retrevoReveal,
-  ...brandImages.slice(RETREVO_SLOT),
   // Also the home page's "Brand Identity" service card. 16:9, so it is letterboxed rather than cropped.
   { name: 'Glow Atelier', src: canva.brandKit.src, alt: canva.brandKit.alt, bg: canva.brandKit.bg },
 ]
