@@ -1,10 +1,31 @@
 import { memo } from 'react'
 
-export type AvatarSpec = { name: string; skin: string; hair: string; shirt: string; bg: string; style: 0 | 1 | 2 | 3 }
+export type AvatarSpec = {
+  name: string
+  skin: string
+  hair: string
+  shirt: string
+  bg: string
+  style: 0 | 1 | 2 | 3
+  /** Square headshot; when set it replaces the illustration. */
+  photo?: string
+}
 
-/** Flat illustrated portrait, used as a placeholder for team / client photos. */
+/** A person's headshot, falling back to a flat illustrated portrait when there is no photo. */
 function AvatarBase({ spec, className = '' }: { spec: AvatarSpec; className?: string }) {
-  const { skin, hair, shirt, bg, style, name } = spec
+  const { skin, hair, shirt, bg, style, name, photo } = spec
+  if (photo) {
+    return (
+      <img
+        src={photo}
+        alt={name}
+        loading="lazy"
+        decoding="async"
+        draggable={false}
+        className={`object-cover ${className}`}
+      />
+    )
+  }
   return (
     <svg viewBox="0 0 100 100" className={className} role="img" aria-label={name}>
       <rect width="100" height="100" fill={bg} />

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { flushSync } from 'react-dom'
 import { subscribeToChannel } from '@/hooks/useCycleConductor'
 import { prefersReducedMotion } from '@/lib/gsap'
+import { hasPlayedThrough } from '@/lib/video'
 
 /** How long a slide stays fully visible in self-timed mode. */
 const HOLD_MS = 3000
@@ -10,6 +11,8 @@ const FADE_MS = 2000
 const FADE_EASING = 'cubic-bezier(0.45, 0, 0.55, 1)'
 /** Upper bound for `nextFrame`, in case rAF is throttled. */
 const FRAME_FALLBACK_MS = 60
+/** Longest a video slide is held waiting for its first full play, in case it stalls or never starts. */
+const MAX_VIDEO_HOLD_MS = 30000
 
 /**
  * Resolves after the browser has painted (two rAFs). Falls back to a timeout so it
@@ -52,6 +55,9 @@ export function CrossfadeCycle({
   const [base, setBase] = useState(0)
   const [overlay, setOverlay] = useState<number | null>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
+  const baseRef = useRef<HTMLDivElement>(null)
+  /** When the current slide became the visible one. */
+  const shownAtRef = useRef(Date.now())
   const indexRef = useRef(0)
   const busy = useRef(false)
   const alive = useRef(true)
@@ -65,6 +71,11 @@ export function CrossfadeCycle({
 
   const advance = useCallback(async () => {
     if (busy.current || slides.length < 2) return
+    // Let an animated logo finish its first full play before swapping it out; this turn is simply skipped.
+    const video = baseRef.current?.querySelector('video')
+    if (video && !hasPlayedThrough(video) && !video.error && Date.now() - shownAtRef.current < MAX_VIDEO_HOLD_MS) {
+      return
+    }
     busy.current = true
     const next = (indexRef.current + 1) % slides.length
 
@@ -84,6 +95,7 @@ export function CrossfadeCycle({
     if (!alive.current) return
     indexRef.current = next
     flushSync(() => setBase(next))
+    shownAtRef.current = Date.now()
     await nextFrame()
     if (!alive.current) return
     setOverlay(null)
@@ -115,7 +127,7 @@ export function CrossfadeCycle({
 
   return (
     <div className="relative h-full w-full overflow-hidden" role="img" aria-label={label}>
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" style={{ zIndex: 1 }}>
+      <div ref={baseRef} className="pointer-events-none absolute inset-0 overflow-hidden" style={{ zIndex: 1 }}>
         {slides[base]}
       </div>
       {overlay !== null && (

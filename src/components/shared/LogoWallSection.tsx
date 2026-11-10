@@ -1,50 +1,52 @@
 import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { logos } from '@/data/art'
-import { LogoArt } from '@/components/art/LogoArt'
+import { logoMarks } from '@/data/work'
 import { CanvaLogo } from '@/components/art/CanvaArt'
 import { canva } from '@/data/canva'
 
 type Tile =
-  | { kind: 'logo'; ref: number; bg: string }
+  | { kind: 'mark'; ref: number }
   | { kind: 'img'; img: { src: string; alt: string }; bg: string; pad?: string }
   | { kind: 'stat'; value: string; label: string; bg: string; fg: string }
 
+/** The marks are exported on white, so their tiles match. */
+const MARK_BG = '#ffffff'
+
 const lanes: Tile[][] = [
   [
-    { kind: 'logo', ref: 9, bg: '#d9ccff' },
+    { kind: 'mark', ref: 0 },
     { kind: 'img', img: canva.glowAtelier, bg: canva.glowAtelier.bg, pad: '0' },
-    { kind: 'logo', ref: 2, bg: '#c9f3dc' },
-    { kind: 'logo', ref: 13, bg: '#ffe0d1' },
+    { kind: 'mark', ref: 1 },
+    { kind: 'mark', ref: 2 },
     { kind: 'img', img: canva.voltage, bg: canva.voltage.bg, pad: '0' },
     { kind: 'stat', value: '120+', label: 'Projects', bg: '#6a3df2', fg: '#ffffff' },
-    { kind: 'logo', ref: 15, bg: '#fff3b0' },
-    { kind: 'logo', ref: 19, bg: '#e3ecff' },
-    { kind: 'logo', ref: 6, bg: '#f2f2ee' },
+    { kind: 'mark', ref: 3 },
+    { kind: 'mark', ref: 4 },
+    { kind: 'mark', ref: 5 },
     { kind: 'stat', value: '98%', label: 'Referrals', bg: '#04d66d', fg: '#000000' },
-    { kind: 'logo', ref: 29, bg: '#ffe6ef' },
+    { kind: 'mark', ref: 6 },
   ],
   [
     { kind: 'stat', value: '850+', label: 'Logos Delivered', bg: '#f5e52b', fg: '#000000' },
-    { kind: 'logo', ref: 0, bg: '#dff3ff' },
+    { kind: 'mark', ref: 7 },
     { kind: 'img', img: { src: canva.skull.poster, alt: canva.skull.alt }, bg: '#000000', pad: '0' },
-    { kind: 'logo', ref: 21, bg: '#ece7ff' },
+    { kind: 'mark', ref: 8 },
     { kind: 'img', img: canva.crownroast, bg: canva.crownroast.bg, pad: '0' },
-    { kind: 'logo', ref: 10, bg: '#fff1d6' },
+    { kind: 'mark', ref: 9 },
     { kind: 'stat', value: '4.9★', label: 'Client Rating', bg: '#0b1f14', fg: '#04d66d' },
-    { kind: 'logo', ref: 24, bg: '#e9f7ee' },
-    { kind: 'logo', ref: 3, bg: '#f5f5f5' },
+    { kind: 'mark', ref: 10 },
+    { kind: 'mark', ref: 11 },
   ],
   [
-    { kind: 'logo', ref: 27, bg: '#fde9d9' },
+    { kind: 'mark', ref: 12 },
     { kind: 'stat', value: '30+', label: 'Countries', bg: '#ff6b2b', fg: '#ffffff' },
     { kind: 'img', img: canva.harborline, bg: canva.harborline.bg, pad: '0' },
-    { kind: 'logo', ref: 4, bg: '#e6f6ff' },
+    { kind: 'mark', ref: 13 },
     { kind: 'img', img: canva.northpeak, bg: canva.northpeak.bg, pad: '0' },
-    { kind: 'logo', ref: 17, bg: '#e9f1df' },
-    { kind: 'logo', ref: 22, bg: '#f4efe9' },
+    { kind: 'mark', ref: 14 },
+    { kind: 'mark', ref: 15 },
     { kind: 'stat', value: '100%', label: 'Custom Made', bg: '#111111', fg: '#ffffff' },
-    { kind: 'logo', ref: 11, bg: '#e7ecf3' },
+    { kind: 'mark', ref: 16 },
   ],
 ]
 
@@ -87,12 +89,15 @@ export function LogoWallSection() {
                       key={i}
                       aria-hidden={i >= lane.length || undefined}
                       className="mx-auto mb-4 flex aspect-square w-full max-w-[118px] flex-col items-center justify-center overflow-hidden rounded-lg text-center shadow-[0_16px_30px_rgba(0,0,0,0.16)]"
-                      style={{ backgroundColor: t.bg, color: t.kind === 'stat' ? t.fg : undefined }}
+                      style={{
+                        backgroundColor: t.kind === 'mark' ? MARK_BG : t.bg,
+                        color: t.kind === 'stat' ? t.fg : undefined,
+                      }}
                     >
                       {t.kind === 'img' ? (
                         <CanvaLogo img={t.img} bg={t.bg} pad={t.pad} />
-                      ) : t.kind === 'logo' ? (
-                        <LogoArt spec={{ ...logos[t.ref], bg: t.bg, tagline: undefined }} className="h-full w-full" />
+                      ) : t.kind === 'mark' ? (
+                        <CanvaLogo img={logoMarks[t.ref]} bg={MARK_BG} pad="0" />
                       ) : (
                         <>
                           <p className="text-2xl font-black tracking-tight md:text-3xl">{t.value}</p>

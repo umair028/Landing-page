@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import type { canva } from '@/data/canva'
 import { prefersReducedMotion } from '@/lib/gsap'
+import { PLAYED_THROUGH_ATTR } from '@/lib/video'
 
 type Img = { src: string; alt: string }
 
@@ -47,6 +48,7 @@ export function CanvaCover({ img, className = 'h-full w-full' }: { img: Img; cla
 /**
  * Muted looping video that only plays while on screen (saves CPU/battery),
  * and shows the still poster for visitors who prefer reduced motion.
+ * Marks itself with `PLAYED_THROUGH_ATTR` after its first full play, so slideshows can wait for it.
  */
 export function CanvaVideo({
   video,
@@ -70,7 +72,21 @@ export function CanvaVideo({
       else el.pause()
     })
     io.observe(el)
-    return () => io.disconnect()
+
+    // A looping video never fires `ended`, so a full play shows up as the playhead jumping back to the start.
+    let lastTime = 0
+    const markPlayed = () => el.setAttribute(PLAYED_THROUGH_ATTR, '')
+    const onTimeUpdate = () => {
+      if (el.currentTime < lastTime - 0.5) markPlayed()
+      lastTime = el.currentTime
+    }
+    el.addEventListener('timeupdate', onTimeUpdate)
+    el.addEventListener('ended', markPlayed)
+    return () => {
+      io.disconnect()
+      el.removeEventListener('timeupdate', onTimeUpdate)
+      el.removeEventListener('ended', markPlayed)
+    }
   }, [])
 
   return (

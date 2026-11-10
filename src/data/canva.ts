@@ -23,7 +23,7 @@ export const canva = {
     alt: 'Design Horizon creative studio logo over a curved glass building',
   },
   animatedLogo: {
-    src: 'https://cdn.dribbble.com/userupload/23618357/file/original-fbde356669b57a4a80f6c108523a1004.gif',
+    src: '/work/motion/stacked-cards.gif',
     alt: 'Animated logo reveal',
   },
   skull: {

@@ -1,5 +1,3 @@
-import { site } from '@/config/site'
-
 /** Words in the scrolling strip at the bottom of the hero. */
 export const marqueeWords = ['Branding', 'Websites', 'Strategy', 'Motion', 'Development', 'Campaigns', 'Design']
 
@@ -63,34 +61,28 @@ export const faqs = [
   },
 ]
 
+/** Client quotes. People already shown in the hero (people 0–3) are left out so no face appears twice. */
 export const testimonials = [
   {
-    quote: `${site.shortName} understood where our brand was heading before we could put it into words.`,
-    name: 'Theo Marsh',
-    role: 'Founder & Creative Director',
-    company: 'Northline Studio',
-    person: 0,
+    quote: 'Our rebrand went live on time, on budget, and our customers noticed the difference in the first week.',
+    name: 'Hana Becker',
+    role: 'Marketing Lead',
+    company: 'Fernwood Botanicals',
+    person: 7,
   },
   {
-    quote: 'Three concepts in two days, and every one of them felt like it belonged to us. Picking was the hard part.',
-    name: 'Ines Rocha',
-    role: 'Owner',
-    company: 'Kettle & Crumb Bakehouse',
-    person: 1,
+    quote: 'The new identity made us look like the company we had become, not the one we started as.',
+    name: 'Owen Hale',
+    role: 'Founder',
+    company: 'Summit Fit',
+    person: 5,
   },
   {
-    quote: 'Clear updates, quick replies and a website that finally looks like the company we actually are.',
-    name: 'Ken Ito',
-    role: 'Managing Partner',
-    company: 'Atlas Freight',
-    person: 2,
-  },
-  {
-    quote: 'Our new mark works on a tiny app icon and on a ten-metre sign. That is exactly what we asked for.',
-    name: 'Zola Adeyemi',
-    role: 'Head of Marketing',
-    company: 'Voltage Charging',
-    person: 3,
+    quote: 'After thirty years in business we finally have a brand that feels as considered as our service.',
+    name: 'Elena Hart',
+    role: 'Founder',
+    company: 'Lumen Dental',
+    person: 8,
   },
   {
     quote: 'No jargon, no surprise invoices. We knew the price and the timeline from the very first message.',
@@ -99,11 +91,19 @@ export const testimonials = [
     company: 'Glow Atelier',
     person: 4,
   },
+  {
+    quote: 'They asked better questions about our business than our last agency did in a year. The logo shows it.',
+    name: 'Mateo Cruz',
+    role: 'Director',
+    company: 'Mason Legal',
+    person: 6,
+  },
 ]
 
 /** Scripted conversation that plays in the Studio section mock chat. */
 export const chatScript: Array<
   | { from: 'client' | 'studio'; kind: 'text'; text: string }
+  /** `images` index into `logoMarks` from data/work. */
   | { from: 'studio'; kind: 'concepts'; text: string; images: number[]; picked?: number }
   | { from: 'studio'; kind: 'file'; text: string; file: string; size: string }
 > = [
@@ -114,21 +114,22 @@ export const chatScript: Array<
     from: 'studio',
     kind: 'concepts',
     text: 'Three directions based on your brief. Pick one to refine.',
-    images: [5, 1, 26],
+    // Mothership Coffee, Mountain Madre (sun emblem), Egg Boy
+    images: [11, 13, 6],
   },
   { from: 'client', kind: 'text', text: 'The second one. The rising sun fits our early-morning story.' },
   {
     from: 'studio',
     kind: 'concepts',
     text: 'Done. Here is the refined version with spacing and colour tuned.',
-    images: [1],
+    images: [13],
     picked: 0,
   },
   {
     from: 'studio',
     kind: 'file',
     text: 'Your final files and brand kit are ready to download.',
-    file: 'KettleCrumb_BrandKit.zip',
+    file: 'MountainMadre_BrandKit.zip',
     size: '24 MB',
   },
   { from: 'client', kind: 'text', text: 'This is exactly the brand we pictured. Thanks for the clear updates.' },

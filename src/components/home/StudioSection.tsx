@@ -4,8 +4,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { site } from '@/config/site'
 import { chatScript } from '@/data/content'
-import { logos } from '@/data/art'
-import { LogoArt } from '@/components/art/LogoArt'
+import { logoMarks } from '@/data/work'
 
 type Msg = (typeof chatScript)[number]
 
@@ -55,7 +54,14 @@ function Body({ m }: { m: Msg }) {
               key={img}
               className={`relative overflow-hidden rounded-lg ring-1 ring-black/10 ${single ? 'h-32' : 'aspect-square'}`}
             >
-              <LogoArt spec={logos[img]} className="h-full w-full" />
+              <img
+                src={logoMarks[img].src}
+                alt={logoMarks[img].alt}
+                loading="lazy"
+                decoding="async"
+                draggable={false}
+                className="h-full w-full bg-white object-contain"
+              />
               {!single && (
                 <span className="absolute left-1 top-1 grid h-4 w-4 place-items-center rounded-full bg-black text-[9px] font-black text-white">
                   {i + 1}
@@ -148,7 +154,7 @@ function ClientChat() {
           <Who from="client" />
           <div className="text-left">
             <p className="text-sm font-black leading-tight">Ines Rocha</p>
-            <p className="text-xs font-semibold text-black/50">Kettle &amp; Crumb · New logo</p>
+            <p className="text-xs font-semibold text-black/50">Mountain Madre · New logo</p>
           </div>
         </div>
         <span
@@ -188,7 +194,6 @@ export function StudioSection() {
   const [name, setName] = useState('')
   const cardRef = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: cardRef, offset: ['start end', 'end start'] })
-  const rotate = useTransform(scrollYProgress, [0, 1], [-7, 1])
   const y = useTransform(scrollYProgress, [0, 1], [50, -30])
 
   const submit = (e: FormEvent) => {
@@ -242,7 +247,7 @@ export function StudioSection() {
             />
             <button
               type="submit"
-              className="group flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-full bg-acid-yellow px-5 py-4 text-[13px] font-black uppercase tracking-wider text-black min-[400px]:px-8 min-[400px]:text-sm min-[400px]:tracking-widest shadow-[0_14px_30px_rgba(0,0,0,0.2)] transition-colors hover:bg-white max-md:!mt-0"
+              className="group flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-full bg-acid-yellow px-5 py-4 text-[13px] font-black uppercase tracking-wider text-black shadow-[0_14px_30px_rgba(0,0,0,0.2)] transition-colors hover:bg-white max-md:!mt-0 min-[400px]:px-8 min-[400px]:text-sm min-[400px]:tracking-widest"
             >
               Start Your Project Brief
               <ArrowRight size={16} strokeWidth={2.75} className="transition-transform group-hover:translate-x-1" />
@@ -251,7 +256,7 @@ export function StudioSection() {
         </div>
         <div data-reveal="scale" className="relative" ref={cardRef}>
           <motion.div
-            style={{ rotate, y }}
+            style={{ y }}
             className="rounded-2xl bg-white p-6 text-black shadow-[0_40px_100px_rgba(0,0,0,0.3)]"
           >
             <div className="mb-8 flex items-center justify-between border-b pb-4">

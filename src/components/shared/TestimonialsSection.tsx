@@ -30,13 +30,13 @@ export function TestimonialsSection() {
       >
         <div data-reveal-children="">
           <p className="mb-4 text-xs font-black uppercase tracking-[0.28em] text-black/60">Client feedback</p>
-          <h2 className="mx-auto max-w-3xl text-[2rem] font-black min-[360px]:text-4xl normal-case leading-[0.95] tracking-[-0.04em] sm:text-6xl">
+          <h2 className="mx-auto max-w-3xl text-[2rem] font-black normal-case leading-[0.95] tracking-[-0.04em] min-[360px]:text-4xl sm:text-6xl">
             Clear communication,
             <br />
             and work that lasts.
           </h2>
           <div
-            className="my-10 flex items-center justify-center gap-3 md:my-12 md:gap-5"
+            className="my-10 flex flex-wrap items-center justify-center gap-3 md:my-12 md:gap-5"
             role="tablist"
             aria-label="Testimonials"
           >
