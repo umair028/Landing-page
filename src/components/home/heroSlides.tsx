@@ -8,8 +8,8 @@ import { shuffled } from '@/lib/shuffle'
 
 /*
  * Slides for the rotating hero cards, built from the same pieces as the Portfolio section.
- * Every piece goes to exactly one card, so two cards never show the same work at once.
- * Each card's order is shuffled with a fixed seed: mixed, but stable between visits.
+ * Each card mixes every kind of work; every piece goes to exactly one card, so two cards
+ * never show the same work at once. Orders are shuffled with fixed seeds: mixed, but stable.
  */
 
 /** Fixed seed for the hero card shuffles. */
@@ -26,43 +26,46 @@ const monitor = (i: number) => (
   </div>
 )
 
-/** Splits a list into its even- and odd-indexed halves. */
-const halves = <T,>(items: readonly T[]): [T[], T[]] => [
-  items.filter((_, i) => i % 2 === 0),
-  items.filter((_, i) => i % 2 === 1),
-]
-
-const [logosA, logosB] = halves(clientLogos)
-const [motionA, motionB] = halves(motionWork)
-const [shotsA, shotsB] = halves(websiteShots)
-
-const deck = (items: WorkImage[], seed: number) => shuffled(items, seed).map(piece)
-
-/** Left-top card: client logos. */
-export const logoSlides: ReactNode[] = deck(logosA, HERO_SHUFFLE_SEED)
-
-/** Left-middle card: the rest of the client logos mixed with website mockups. */
-export const logoWebSlides: ReactNode[] = deck([...logosB, ...shotsA], HERO_SHUFFLE_SEED + 1)
-
 /** Brand Identity pieces picked for the hero; the rest stay in the Portfolio section only. */
 const HERO_BRAND_PICKS = ["Pancho's", 'Maria Bella', 'Retrevo', 'Hair Reality', 'Compacta']
 
 const heroBrand = brandWork.filter((b) => HERO_BRAND_PICKS.includes(b.name))
 
-/** Left-bottom card: a hand-picked set of brand identity mockups. */
-export const brandSlides: ReactNode[] = deck(heroBrand, HERO_SHUFFLE_SEED + 2)
+/** Number of rotating cards in the hero (see `heroChannels`). */
+const CARD_COUNT = 6
 
-/** Right-bottom card: logo animations. */
-export const motionSlides: ReactNode[] = deck(motionA, HERO_SHUFFLE_SEED + 3)
+/** Every kind of work the hero shows, one list per kind. */
+const kinds: ReactNode[][] = [
+  clientLogos.map(piece),
+  heroBrand.map(piece),
+  motionWork.map(piece),
+  websiteShots.map(piece),
+  sites.map((_, i) => monitor(i)),
+]
 
-/** Right-top card: the rest of the animations mixed with website mockups. */
-export const webMotionSlides: ReactNode[] = deck([...motionB, ...shotsB], HERO_SHUFFLE_SEED + 4)
+/**
+ * Deals each kind round-robin across the cards (each kind starting one card further along),
+ * so every card gets an even mix of logos, brand pieces, animations and websites, then
+ * shuffles each card's pile.
+ */
+const cards: ReactNode[][] = Array.from({ length: CARD_COUNT }, () => [])
+kinds.forEach((kind, k) => {
+  shuffled(kind, HERO_SHUFFLE_SEED + k).forEach((slide, i) => cards[(i + k) % CARD_COUNT].push(slide))
+})
+const [cardA, cardB, cardC, cardD, cardE, cardF] = cards.map((pile, c) => shuffled(pile, HERO_SHUFFLE_SEED + 100 + c))
 
-/** Right-middle card: the drawn website designs. */
-export const webSlides: ReactNode[] = shuffled(
-  sites.map((_, i) => i),
-  HERO_SHUFFLE_SEED + 5,
-).map(monitor)
+/** Left-top card. */
+export const logoSlides: ReactNode[] = cardA
+/** Left-middle card. */
+export const logoWebSlides: ReactNode[] = cardB
+/** Left-bottom card. */
+export const brandSlides: ReactNode[] = cardC
+/** Right-bottom card. */
+export const motionSlides: ReactNode[] = cardD
+/** Right-top card. */
+export const webMotionSlides: ReactNode[] = cardE
+/** Right-middle card. */
+export const webSlides: ReactNode[] = cardF
 
 /** Still images preloaded up front so each slide is ready when its crossfade starts. Videos stream on demand. */
 export const heroImages = [
